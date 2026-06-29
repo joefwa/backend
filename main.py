@@ -37,6 +37,12 @@ class ScoreUpdate(BaseModel):
     elims_scored: int
     placement_points: int
 
+@app.get("/api/secret-purge-database")
+def purge_database(db: Session = Depends(get_db)):
+    db.query(DBTeam).delete()
+    db.commit()
+    return {"message": "All test teams have been permanently deleted."}
+
 @app.get("/")
 def home():
     return {"status": "Sovereign Circuit Core Online. Database Connected."}
