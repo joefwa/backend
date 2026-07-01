@@ -8,9 +8,6 @@ from fastapi import HTTPException
 from pydantic import BaseModel
 
 
-ADMIN_USERNAME = "Joseph"
-ADMIN_PASSWORD = "YourStrongPassword123"
-
 from database import SessionLocal, DBTeam
 
 app = FastAPI(title="The Sovereign Circuit Engine")
@@ -56,8 +53,8 @@ class LoginRequest(BaseModel):
     username: str
     password: str
 
-ADMIN_USERNAME = "Joseph"
-ADMIN_PASSWORD = "Isabella1212"
+ADMIN_USERNAME = os.getenv("ADMIN_USERNAME")
+ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD")
 
 
 @app.post("/api/admin/login")
@@ -121,9 +118,13 @@ def register_team(team: TeamRegistration, db: Session = Depends(get_db)):
 
 @app.get("/api/teams")
 def get_teams(db: Session = Depends(get_db)):
-    teams = db.query(DBTeam).all()
-    return teams
+    teams = (
+        db.query(DBTeam)
+        .order_by(DBTeam.circuit_points.desc())
+        .all()
+    )
 
+    return teams
 
 # -------------------------
 # UPDATE SCORES
