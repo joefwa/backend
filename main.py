@@ -4,6 +4,12 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 import requests
 import os
+from fastapi import HTTPException
+from pydantic import BaseModel
+
+
+ADMIN_USERNAME = "Joseph"
+ADMIN_PASSWORD = "YourStrongPassword123"
 
 from database import SessionLocal, DBTeam
 
@@ -46,6 +52,31 @@ class ScoreUpdate(BaseModel):
     elims_scored: int
     placement_points: int
 
+class LoginRequest(BaseModel):
+    username: str
+    password: str
+
+ADMIN_USERNAME = "Joseph"
+ADMIN_PASSWORD = "Isabella1212"
+
+
+@app.post("/api/admin/login")
+def admin_login(data: LoginRequest):
+
+    if (
+        data.username == ADMIN_USERNAME
+        and
+        data.password == ADMIN_PASSWORD
+    ):
+
+        return {
+            "success": True
+        }
+
+    raise HTTPException(
+        status_code=401,
+        detail="Invalid credentials."
+    )
 
 # -------------------------
 # REGISTER TEAM
