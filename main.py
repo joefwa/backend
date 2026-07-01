@@ -2,6 +2,7 @@ from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
+import requests
 
 from database import SessionLocal, DBTeam
 
@@ -104,6 +105,26 @@ def update_team_score(score_data: ScoreUpdate, db: Session = Depends(get_db)):
     # 4. Save the updated stats permanently
     db.commit()
     db.refresh(target_team)
+
+@app.post("/api/create-payment")
+def create_payment(payment_data: dict):
+    # This URL initializes the payment with Paystack
+    url = "https://api.paystack.co/transaction/initialize"
+    
+    headers = {
+        "Authorization": "sk_test_b47776d5d284b512fd8fed6657543f7f1416c378", # USE YOUR SECRET KEY HERE
+        "Content-Type": "application/json"
+    }
+    
+    # We tell Paystack how much to charge and where to email the receipt
+    payload = {
+        "email": payment_data["email"],
+        "amount": 25000 * 100, # 25,000 Naira
+        "callback_url": "https://your-website-url.netlify.app/"
+    }
+    
+    response = requests.post(url, headers=headers, json=payload)
+    return response.json()
 
     return {
         "success": True, 
