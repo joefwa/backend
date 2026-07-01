@@ -133,7 +133,7 @@ def update_score(score_data: ScoreUpdate, db: Session = Depends(get_db)):
 @app.post("/api/create-payment")
 def create_payment(payment_data: dict):
 
-    SECRET_KEY = "sk_test_b47776d5d284b512fd8fed6657543f7f1416c378"
+    SECRET_KEY = os.getenv("PAYSTACK_SECRET_KEY")
 
     url = "https://api.paystack.co/transaction/initialize"
 
@@ -169,4 +169,43 @@ def purge_database(db: Session = Depends(get_db)):
 
     return {
         "message": "Database cleared."
+    }
+
+# -------------------------
+# ADMIN DASHBOARD
+# -------------------------
+
+@app.get("/api/admin/dashboard")
+def admin_dashboard(db: Session = Depends(get_db)):
+
+    teams = db.query(DBTeam).all()
+
+    total_teams = len(teams)
+
+    battle_royale = len([
+        team for team in teams
+        if team.game_mode == "BR"
+    ])
+
+    multiplayer = len([
+        team for team in teams
+        if team.game_mode == "MP"
+    ])
+
+    total_revenue = total_teams * 25000
+
+    total_matches = sum(team.matches_played for team in teams)
+
+    total_elims = sum(team.total_elims for team in teams)
+
+    total_points = sum(team.circuit_points for team in teams)
+
+    return {
+        "totalTeams": total_teams,
+        "battleRoyale": battle_royale,
+        "multiplayer": multiplayer,
+        "revenue": total_revenue,
+        "matchesPlayed": total_matches,
+        "totalElims": total_elims,
+        "totalPoints": total_points
     }
