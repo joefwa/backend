@@ -80,7 +80,7 @@ def create_payment(payment_data: dict):
     payload = {
         "email": payment_data["email"],
         "amount": 25000 * 100, # 25,000 Naira in kobo
-        "callback_url": "https://sovereign-circuit.netlify.app/"
+        "callback_url": "https://sovreignesportsng.netlify.app/"
     }
     
     response = requests.post(url, headers=headers, json=payload)
